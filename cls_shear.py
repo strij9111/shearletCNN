@@ -26,7 +26,6 @@ import pyshearlab
 
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:512"
 
-# Путь к датасету
 root_dir = "e:\\dvc"
 batch_size = 8
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -79,7 +78,7 @@ class CommandDataset(Dataset):
         self.thresholdingFactor = 1
         
         n_mels = 251
-        hop_length = 32
+        hop_length = 64
         sample_rate = 16000 
         
         self.shearletSystem = pyshearlab.SLgetShearletSystem2D(0, 251, 251, self.scales)
@@ -137,7 +136,8 @@ class CommandDataset(Dataset):
             
             
         spec = self.transform(signal)
-        coeffs = pyshearlab.SLsheardec2D(spec.detach().cpu().numpy().astype('float32'), self.shearletSystem)
+        spec = spec.detach().cpu().numpy().astype('float32')
+        coeffs = pyshearlab.SLsheardec2D(spec, self.shearletSystem)
 
         # thresholding
         oldCoeffs = coeffs.copy()
